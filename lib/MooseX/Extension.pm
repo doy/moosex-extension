@@ -31,6 +31,12 @@ sub init_meta {
     shift;
     my %options = @_;
     Moose->init_meta(%options);
+    my $base_class_roles = delete $args->{-base_class_roles};
+    my %metaclass_roles = map {
+        my $key = $_;
+        $key =~ s/^-//;
+        ($key, $args->{-$key});
+    } keys %$args;
     Moose::Util::MetaRole::apply_metaclass_roles(
         for_class => $options{for_class},
     );
