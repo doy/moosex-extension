@@ -2,12 +2,19 @@ package MooseX::Extension;
 use Moose ();
 use Moose::Exporter;
 use Moose::Util::MetaRole;
+use Data::OptList qw(mkopt_hash);
 
-my ($import, $unimport);
+my ($unimport, $args);
 
 sub import {
     my $caller = caller;
-    ($import, $unimport) = Moose::Exporter->build_import_methods;
+    shift;
+    $args = mkopt_hash(\@_);
+    my @also = grep { !defined $args->{$_} && delete $args->{$_} } keys %$args;
+    my $import;
+    ($import, $unimport) = Moose::Exporter->build_import_methods(
+        also => \@also,
+    );
     goto $import;
 }
 
