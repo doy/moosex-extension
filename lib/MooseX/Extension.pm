@@ -4,7 +4,7 @@ use Moose::Exporter;
 use Moose::Util::MetaRole;
 use Data::OptList qw(mkopt_hash);
 
-my ($unimport, $args);
+my ($unimport, $on_unimport, $args);
 
 sub import {
     my $caller = caller;
@@ -15,10 +15,14 @@ sub import {
     ($import, $unimport) = Moose::Exporter->build_import_methods(
         also => \@also,
     );
+    $args->{-on_import}->($caller) if defined $args->{-on_import};
+    $on_unimport = delete $args->{-on_unimport};
     goto $import;
 }
 
 sub unimport {
+    my $caller = caller;
+    $on_unimport->($caller) if defined $on_unimport;
     goto $unimport;
 }
 
